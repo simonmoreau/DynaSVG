@@ -1,0 +1,20 @@
+{
+  "license": "",
+  "file_hash": null,
+  "name": "DynaSVG",
+  "version": "0.0.1",
+  "description": "Nodes to import and export SVG.",
+  "group": "",
+  "keywords": null,
+  "dependencies": [],
+  "contents": "",
+  "engine_version": "2.6.0.0",
+  "engine": "dynamo",
+  "engine_metadata": "",
+  "site_url": "",
+  "repository_url": "",
+  "contains_binaries": true,
+  "node_libraries": [
+    "DynaSVG, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+  ]
+}

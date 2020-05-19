@@ -1,0 +1,11 @@
+﻿<?xml version="1.0"?>
+<doc>
+  <assembly>
+    <name>DynaSVG</name>
+  </assembly>
+  <namespaces>
+    <namespace name="DynaSVG">
+      <category>DynaSVG</category>
+    </namespace>
+  </namespaces>
+</doc>
