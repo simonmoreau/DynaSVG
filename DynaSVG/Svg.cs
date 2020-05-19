@@ -34,8 +34,14 @@ namespace DynaSVG
         /// <param name="path">
         /// The path where to the newly created SVG file.
         /// </param>
+        /// <param name="option">
+        /// The option when saving the SVG document.
+        /// </param>
         /// <returns>A boolean indicating if the document have been saved.</returns>
-        public static bool SaveAs(Svg svg, string path)
+        /// <search>
+        /// save
+        /// </search>
+        public static bool SaveAs(Svg svg, string path, [DefaultArgument("DynaSVG.Svg.GetNull()")]Option option)
         {
             svg.InnerDocument.Write(path);
             return true;
@@ -48,7 +54,10 @@ namespace DynaSVG
         /// A list containing geometry to be added to the SVG document.
         /// </param>
         /// <returns>The SVG document</returns>
-        public static Svg FromGeometry(Geometry[] geometry)
+        /// <search>
+        /// geometry, open
+        /// </search>
+        public static Svg ByGeometry([DefaultArgument("DynaSVG.Svg.GetNull()")]Geometry geometry)
         {
             SvgDocument svgDoc = new SvgDocument
             {
@@ -78,10 +87,33 @@ namespace DynaSVG
         /// The path to the svg file.
         /// </param>
         /// <returns>The SVG document</returns>
-        public static Svg FromFile(string path)
+        /// <search>
+        /// file, open
+        /// </search>
+        public static Svg ByFile(string path)
         {
             SvgDocument doc = SvgDocument.Open(path);
             return new Svg(doc);
+        }
+
+        /// <summary>
+        /// A series of options for saving the SVG document.
+        /// </summary>
+        /// <param name="viewbox">
+        /// A rectangle defining the extend of the SVG document
+        /// </param>
+        /// <param name="scale">
+        /// The scale between Dynamo units and SVG units
+        /// </param>
+        /// <returns>The options to be used for saving the SVG document.</returns>
+        /// <search>
+        /// options, option, save
+        /// </search>
+        public static Option Option(
+            [DefaultArgument("DynaSVG.Svg.GetNull()")]Autodesk.DesignScript.Geometry.Rectangle viewbox,
+            [DefaultArgument("DynaSVG.Svg.GetNull()")]double? scale)
+        {
+            return new Option(viewbox,scale);
         }
 
         private Svg(SvgDocument svgDocument)
@@ -89,5 +121,30 @@ namespace DynaSVG
             InnerDocument = svgDocument;
         }
 
+        [IsVisibleInDynamoLibrary(false)]
+        public static object GetNull()
+        {
+            return null;
+        }
+    }
+
+    [IsVisibleInDynamoLibrary(false)]
+    public class Option
+    {
+        public Option(Autodesk.DesignScript.Geometry.Rectangle rectangle, double? scale)
+        {
+            double innerScale = scale ?? 1;
+
+            if (rectangle != null)
+            {
+                BoundingBox boundingBox = rectangle.BoundingBox;
+                viewbox = new SvgViewBox(
+                    Convert.ToSingle(boundingBox.MinPoint.X * innerScale),
+                    Convert.ToSingle(boundingBox.MinPoint.Y * innerScale),
+                    Convert.ToSingle(rectangle.Width * innerScale),
+                    Convert.ToSingle(rectangle.Height * innerScale));
+            }
+        }
+        public SvgViewBox viewbox { get; set; }
     }
 }
