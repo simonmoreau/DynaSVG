@@ -23,6 +23,10 @@ namespace DynaSVG
             {
                 svgVisualElement = ConvertLine((Line)curve);
             }
+            else if (curve is Circle)
+            {
+                svgVisualElement = ConvertCircle((Circle)curve);
+            }
 
             svgVisualElement.Stroke = new SvgColourServer(System.Drawing.Color.Black);
             svgVisualElement.StrokeWidth = 1;
@@ -65,6 +69,17 @@ namespace DynaSVG
 
 
             return svgPath;
+
+        }
+
+        private static SvgCircle ConvertCircle(Circle circle)
+        {
+            return new SvgCircle
+            {
+                Radius = new SvgUnit(SvgUnitType.Pixel, (float)circle.Radius),
+                CenterX = new SvgUnit(SvgUnitType.Pixel,(float)circle.CenterPoint.X),
+                CenterY = new SvgUnit(SvgUnitType.Pixel, (float)circle.CenterPoint.Y),
+            };
 
         }
 
