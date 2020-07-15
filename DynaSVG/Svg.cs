@@ -34,48 +34,63 @@ namespace DynaSVG
         /// <param name="path">
         /// The path where to the newly created SVG file.
         /// </param>
-        /// <param name="option">
-        /// The option when saving the SVG document.
-        /// </param>
         /// <returns>A boolean indicating if the document have been saved.</returns>
         /// <search>
         /// save
         /// </search>
-        public static bool SaveAs(Svg svg, string path, [DefaultArgument("DynaSVG.Svg.GetNull()")]Option option)
+        public static bool SaveAs(Svg svg, string path)
         {
-            svg.InnerDocument.Write(path);
-            return true;
+            if (svg != null)
+            {
+                svg.InnerDocument.Write(path);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
         }
 
         /// <summary>
         /// Create a new SVG document from geometry
         /// </summary>
-        /// <param name="geometry">
-        /// A list containing geometry to be added to the SVG document.
-        /// </param>
+        /// <param name="curves">A list containing geometry to be added to the SVG document.</param>
+        /// <param name="option">The option when creating the SVG document.</param>
         /// <returns>The SVG document</returns>
         /// <search>
         /// geometry, open
         /// </search>
-        public static Svg ByGeometry([DefaultArgument("DynaSVG.Svg.GetNull()")]Geometry geometry)
+        public static Svg FromCurves([DefaultArgument("DynaSVG.Svg.GetNull()")]Curve[] curves, [DefaultArgument("DynaSVG.Svg.GetNull()")]Option option)
         {
+            
             SvgDocument svgDoc = new SvgDocument
             {
-                Width = 500,
-                Height = 500,
-                ViewBox = new SvgViewBox(-250, -250, 500, 500),
+                Width = 20,
+                Height = 20,
+                ViewBox = new SvgViewBox(-10, -10, 20, 20),
             };
+
+            if (option != null)
+            {
+                svgDoc = new SvgDocument
+                {
+                    Width = option.viewbox.Width,
+                    Height = option.viewbox.Height,
+                    ViewBox = new SvgViewBox(option.viewbox.MinX, option.viewbox.MinY, option.viewbox.Width, option.viewbox.Height),
+                };
+            }
 
             var group = new SvgGroup();
             svgDoc.Children.Add(group);
 
-            group.Children.Add(new SvgCircle
+            if (curves != null)
             {
-                Radius = 100,
-                Fill = new SvgColourServer(Color.Red),
-                Stroke = new SvgColourServer(Color.Black),
-                StrokeWidth = 2
-            });
+                foreach (Curve curve in curves)
+                {
+                    svgDoc.Children.Add(SvgConversion.ConvertCurve(curve));
+                }
+            }
 
             return new Svg(svgDoc);
         }
