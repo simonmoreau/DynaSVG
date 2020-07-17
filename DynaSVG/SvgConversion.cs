@@ -29,7 +29,7 @@ namespace DynaSVG
             }
 
             svgVisualElement.Stroke = new SvgColourServer(System.Drawing.Color.Black);
-            svgVisualElement.StrokeWidth = 1;
+            svgVisualElement.StrokeWidth = new SvgUnit((float)0.2);
             svgVisualElement.Fill = SvgPaintServer.None;
 
             return svgVisualElement;
@@ -42,9 +42,25 @@ namespace DynaSVG
             SvgPath svgPath = new SvgPath();
 
             SvgPathSegmentList svgPathSegmentList = new SvgPathSegmentList();
-            svgPathSegmentList.Add(new SvgMoveToSegment(new System.Drawing.PointF(0, 0)));
+            svgPathSegmentList.Add(new SvgMoveToSegment(arc.StartPoint.ConvertToPointF()));
 
-            SvgArcSegment svgArcSegment = new SvgArcSegment(arc.StartPoint.ConvertToPointF(), (float)arc.Radius, (float)arc.Radius, (float)arc.SweepAngle, SvgArcSize.Large, SvgArcSweep.Positive, arc.EndPoint.ConvertToPointF());
+            Vector a = Vector.ByTwoPoints(arc.CenterPoint, arc.StartPoint);
+            Vector b = Vector.ByTwoPoints(arc.CenterPoint, arc.EndPoint);
+
+            double angleAboutAxis = a.AngleAboutAxis(b, Vector.ZAxis());
+
+            a.Dispose();
+            b.Dispose();
+
+            
+            SvgArcSweep svgArcSweep = SvgArcSweep.Positive;
+
+            if (angleAboutAxis >= 180) { svgArcSweep = SvgArcSweep.Negative; }
+
+            SvgArcSize svgArcSize = SvgArcSize.Small;
+            if (arc.SweepAngle > 180 ) { svgArcSize = SvgArcSize.Large; }
+
+            SvgArcSegment svgArcSegment = new SvgArcSegment(svgPathSegmentList.Last.End, (float)arc.Radius, (float)arc.Radius, (float)arc.SweepAngle, svgArcSize, svgArcSweep, arc.EndPoint.ConvertToPointF());
 
             svgPathSegmentList.Add(svgArcSegment);
             svgPath.PathData = svgPathSegmentList;
@@ -78,14 +94,14 @@ namespace DynaSVG
             {
                 Radius = new SvgUnit(SvgUnitType.Pixel, (float)circle.Radius),
                 CenterX = new SvgUnit(SvgUnitType.Pixel,(float)circle.CenterPoint.X),
-                CenterY = new SvgUnit(SvgUnitType.Pixel, (float)circle.CenterPoint.Y),
+                CenterY = new SvgUnit(SvgUnitType.Pixel, -(float)circle.CenterPoint.Y),
             };
 
         }
 
         private static System.Drawing.PointF ConvertToPointF(this Point point)
         {
-            System.Drawing.PointF pointF = new System.Drawing.PointF((float)point.X, (float)point.Y);
+            System.Drawing.PointF pointF = new System.Drawing.PointF((float)point.X, -(float)point.Y);
 
             return pointF;
         }
